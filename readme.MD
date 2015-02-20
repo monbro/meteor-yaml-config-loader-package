@@ -31,20 +31,10 @@ Package.onUse(function(api) {
 
 The package will expose a the full config on the server side `YamlConfig` which you can use as showed in the following example. On the client side it will automatically publish only the config `YamlClientConfig` which is stored in the client.yml file. You need to do the following three stepts to make it work.
 
-### A) Load the Config files into your main app
-
-``` js
-if (Meteor.isServer) {
-  // load the configs from our app
-  // as a packae has no access ot the assets of the main app (files in the private folder), we need to pass the `Assets` object
-  YamlConfig.loadFiles(Assets);
-}
-```
-
-### B) Config Files Example
+### A) Create both config files
 
 ``` yml
-// in your meteor app: /private/config/server.yml
+# in your meteor app: /private/config/server.yml
 redis_db:
     url: http://localhost:1234
 
@@ -53,14 +43,24 @@ newsletter:
 ```
 
 ``` yml
-// in your meteor app: /private/config/client.yml
-// likely we only store here default variables etc. no sensetive data
+# in your meteor app: /private/config/client.yml
+# likely we only store here default variables etc. no sensetive data
 
 fruits:
     - apple
     - banana
     - kiwi
     - avocado
+```
+
+### B) Load the Config files into your main app
+
+``` js
+if (Meteor.isServer) {
+  // load the configs from our app
+  // as a packae has no access ot the assets of the main app (files in the private folder), we need to pass the `Assets` object
+  YamlConfig.loadFiles(Assets);
+}
 ```
 
 ### C) Use the configs somewhere in your app
@@ -76,7 +76,6 @@ if (Meteor.isServer) {
 
 ``` js
 if (Meteor.isClient) {
-
   Meteor.call('getClientConfig', function (err, result) {
       if(err) {
           console.log(error);
@@ -86,6 +85,5 @@ if (Meteor.isClient) {
           console.log(myFirstFruit);
       }
   });
-
 }
 ```
