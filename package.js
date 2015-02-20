@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'yaml-config-loader',
+  name: 'monbro:yaml-config-loader',
   summary: 'Easy way of integrating your configuration or settings for client / server by using YAML files.',
   version: '0.1.0',
   git: 'https://github.com/monbro/meteor-yaml-config-loader-package/'
