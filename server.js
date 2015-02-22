@@ -40,19 +40,31 @@ YamlConfig = (function () {
       }
 
       // load the server side config
-      var res = AssetsApp.getText("config/server.yml");
-      if(!res) {
-        console.log("Could not find file /private/config/server.yml in your meteor app!");
-      } else {
-        privateSetServerConfig(res);
+      var errorMsg = "Could not find file /private/config/server.yml in your meteor app!";
+      try {
+        var res = AssetsApp.getText("config/server.yml");
+        if(!res) {
+          console.log(errorMsg);
+        } else {
+          privateSetServerConfig(res);
+        }
+      } catch(error) {
+        console.log(errorMsg);
+        console.log(error);
       }
 
       // load all public client side config
-      var res = AssetsApp.getText("config/client.yml");
-      if(!res) {
-        console.log("Could not find file /private/config/client.yml in your meteor app!");
-      } else {
-        privateSetClientConfig(res);
+      var errorMsg = "Could not find file /private/config/client.yml in your meteor app!";
+      try {
+        var res = AssetsApp.getText("config/client.yml");
+        if(!res) {
+          console.log(errorMsg);
+        } else {
+          privateSetClientConfig(res);
+        }
+      } catch(error) {
+        console.log(errorMsg);
+        console.log(error);
       }
     }
 
