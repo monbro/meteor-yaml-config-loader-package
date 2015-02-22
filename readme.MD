@@ -16,7 +16,7 @@ Compared to the settings.json file, this configuration / settings would be loade
 
 Use `meteor add monbro:yaml-config-loader` to add the package to your meteor app
 
-### Installation in your own meteor package
+### Or installation in your own meteor package
 
 Simply add the following to your package.js file
 
@@ -66,7 +66,7 @@ if (Meteor.isServer) {
 ### C) Use the configs somewhere in your app
 
 ``` js
-// keep in mind, that you need to have called the config loader from step A) before using the following code
+// keep in mind, that you need to have called the config files loader from step B) before using the following code
 if (Meteor.isServer) {
   // from the example yaml file
   var config = YamlConfig.getServerConfig();

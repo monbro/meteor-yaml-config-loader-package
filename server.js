@@ -17,7 +17,7 @@ YamlConfig = (function () {
         data = YAML.safeLoad(s);
       } catch (e) {
         console.log(e);
-        throw new Meteor.Error( "Config file is no valid YAML!" );
+        throw new Meteor.Error( "The file /private/config/server.yml contains no valid YAML!" );
       }
       serverConfig = data;
     }
@@ -28,7 +28,7 @@ YamlConfig = (function () {
         data = YAML.safeLoad(s);
       } catch (e) {
         console.log(e);
-        throw new Meteor.Error( "Config file is no valid YAML!" );
+        throw new Meteor.Error( "The file /private/config/client.yml contains no valid YAML!" );
       }
       clientConfig = data;
     }
@@ -42,7 +42,7 @@ YamlConfig = (function () {
       // load the server side config
       var res = AssetsApp.getText("config/server.yml");
       if(!res) {
-          throw new Meteor.Error( "No server config file found!" );
+        console.log("Could not find file /private/config/server.yml in your meteor app!");
       } else {
         privateSetServerConfig(res);
       }
@@ -50,7 +50,7 @@ YamlConfig = (function () {
       // load all public client side config
       var res = AssetsApp.getText("config/client.yml");
       if(!res) {
-          throw new Meteor.Error( "No client config file found!" );
+        console.log("Could not find file /private/config/client.yml in your meteor app!");
       } else {
         privateSetClientConfig(res);
       }
