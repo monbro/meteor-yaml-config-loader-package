@@ -1,7 +1,9 @@
 // our configuration object
 YamlConfig = (function () {
     var clientConfig = null,
-        serverConfig = null;
+        serverConfig = null,
+        parentAssets,
+        packageSettings;
 
     function publicGetServerConfig() {
         return serverConfig;
@@ -11,56 +13,70 @@ YamlConfig = (function () {
         return clientConfig;
     }
 
-    function privateSetServerConfig(s) {
-      var data;
-      try {
-        data = YAML.safeLoad(s);
-      } catch (e) {
-        console.log(e);
-        throw new Meteor.Error( "The file /private/config/server.yml contains no valid YAML!" );
-      }
-      serverConfig = data;
+    function publicSetPackageSettings(settings) {
+      packageSettings = settings;
     }
 
-    function privateSetClientConfig(s) {
-      var data;
+    function privateStringToObject(s, path) {
       try {
-        data = YAML.safeLoad(s);
+        return YAML.safeLoad(s);
       } catch (e) {
-        console.log(e);
-        throw new Meteor.Error( "The file /private/config/client.yml contains no valid YAML!" );
+        // console.log(e);
+        throw new Meteor.Error( 'The given string of the file '+path+' contains no valid YAML!' );
       }
-      clientConfig = data;
     }
 
-    function publicLoadFiles(AssetsApp) {
+    function publicLoadFiles(assetsApp) {
+      parentAssets = assetsApp;
+
+      // set default settings if there are none
+      if(!packageSettings) {
+        packageSettings = {
+          client: [
+            'config/client.yml'
+          ],
+          server: [
+            'config/server.yml'
+          ]
+        }
+      }
+
       // prevent loading config later from somewhere else or to manipulate it
       if(clientConfig || serverConfig) {
-        throw new Meteor.Error( "Config has been set already!" );
+        throw new Meteor.Error( "YamlConfig has been set already!" );
+      } else {
+        clientConfig = serverConfig = {};
       }
 
-      // load the server side config
-      var errorMsg = "Could not find file /private/config/server.yml in your meteor app!";
-      try {
-        var res = AssetsApp.getText("config/server.yml");
-        if(!res) {
-          console.log(errorMsg);
-        } else {
-          privateSetServerConfig(res);
+      // read out the client settings
+      _.each(packageSettings.client, function(val, key) {
+        var s = readConfigFile(val);
+        if(s !== false) {
+          var obj = privateStringToObject(s, key);
+          _.extend(clientConfig, obj);
         }
-      } catch(error) {
-        console.log(errorMsg);
-        console.log(error);
-      }
+      });
 
-      // load all public client side config
-      var errorMsg = "Could not find file /private/config/client.yml in your meteor app!";
+      // read out the server settings
+      _.each(packageSettings.server, function(val, key) {
+        var s = readConfigFile(val);
+        if(s !== false) {
+          var obj = privateStringToObject(s, key);
+          _.extend(serverConfig, obj);
+        }
+      });
+    }
+
+    function readConfigFile(path) {
+      // load the server side config
+      var errorMsg = 'Could not find file /private/'+path+' in your meteor app!';
       try {
-        var res = AssetsApp.getText("config/client.yml");
+        var res = parentAssets.getText(path);
         if(!res) {
           console.log(errorMsg);
+          throw new Meteor.Error( 'The file '+path+' does not exist!' );
         } else {
-          privateSetClientConfig(res);
+          return res;
         }
       } catch(error) {
         console.log(errorMsg);
@@ -71,6 +87,7 @@ YamlConfig = (function () {
     return {
         getClientConfig: publicGetClientConfig,
         getServerConfig: publicGetServerConfig,
+        setPackageSettings: publicSetPackageSettings,
         loadFiles: publicLoadFiles
     };
 

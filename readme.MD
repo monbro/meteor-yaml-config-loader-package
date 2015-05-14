@@ -87,3 +87,29 @@ if (Meteor.isClient) {
   });
 }
 ```
+
+### Define custom YAML files to be loaded
+
+If you want, you can specify which YAML files should be used and exposed to the client or server side.
+
+``` js
+if (Meteor.isServer) {
+
+  // this is an example of how to specific yaml files to be loaded, you need to set the package settings before loading the yaml files
+  YamlConfig.setPackageSettings({
+      server: [
+          'config/server/default_settings.yml',
+          'config/server/apikeys.yml',
+
+      ],
+      client: [
+          'config/client/main.yml',
+          'config/client/routes.yml',
+          'config/client/theme_options.yml',
+      ]
+  });
+
+  // now you can load the files
+  YamlConfig.loadFiles(Assets);
+}
+```
