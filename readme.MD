@@ -106,7 +106,8 @@ if (Meteor.isServer) {
           'config/client/main.yml',
           'config/client/routes.yml',
           'config/client/theme_options.yml',
-      ]
+      ],
+      // useKeysInObject: true // if you want to have the file names as keys in your object, set this parameter
   });
 
   // now you can load the files

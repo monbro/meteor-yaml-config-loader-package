@@ -21,7 +21,6 @@ YamlConfig = (function () {
       try {
         return YAML.safeLoad(s);
       } catch (e) {
-        // console.log(e);
         throw new Meteor.Error( 'The given string of the file '+path+' contains no valid YAML!' );
       }
     }
@@ -37,7 +36,8 @@ YamlConfig = (function () {
           ],
           server: [
             'config/server.yml'
-          ]
+          ],
+          useKeysInObject: false
         }
       }
 
@@ -45,26 +45,41 @@ YamlConfig = (function () {
       if(clientConfig || serverConfig) {
         throw new Meteor.Error( "YamlConfig has been set already!" );
       } else {
-        clientConfig = serverConfig = {};
+        clientConfig = {};
+        serverConfig = {};
       }
 
       // read out the client settings
-      _.each(packageSettings.client, function(val, key) {
-        var s = readConfigFile(val);
+      _.each(packageSettings.client, function(path) {
+        var s = readConfigFile(path);
         if(s !== false) {
-          var obj = privateStringToObject(s, key);
+          var obj = privateStringToObject(s, path);
+          if(packageSettings.useKeysInObject) {
+            newObj = {};
+            newObj[getFileName(path)] = obj;
+            obj = newObj;
+          }
           _.extend(clientConfig, obj);
         }
       });
 
       // read out the server settings
-      _.each(packageSettings.server, function(val, key) {
-        var s = readConfigFile(val);
+      _.each(packageSettings.server, function(path) {
+        var s = readConfigFile(path);
         if(s !== false) {
-          var obj = privateStringToObject(s, key);
+          var obj = privateStringToObject(s, path);
+          if(packageSettings.useKeysInObject) {
+            newObj = {};
+            newObj[getFileName(path)] = obj;
+            obj = newObj;
+          }
           _.extend(serverConfig, obj);
         }
       });
+    }
+
+    function getFileName(path) {
+      return path.split("/")[path.split("/").length-1].split(".yml")[0];
     }
 
     function readConfigFile(path) {
@@ -73,14 +88,14 @@ YamlConfig = (function () {
       try {
         var res = parentAssets.getText(path);
         if(!res) {
-          console.log(errorMsg);
+          // console.log(errorMsg);
           throw new Meteor.Error( 'The file '+path+' does not exist!' );
         } else {
           return res;
         }
       } catch(error) {
-        console.log(errorMsg);
-        console.log(error);
+        // console.log(errorMsg);
+        // console.log(error);
       }
     }
 
